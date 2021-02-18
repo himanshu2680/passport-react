@@ -1,5 +1,15 @@
-import logo from './logo.svg';
+//packages
+import React from 'react'
+import axios from 'axios'
+import {Route, Link} from 'react-router-dom'
+//components
+import Signup from './components/Signup.js'
+import LoginForm from './components/login-form'
+import Navbar from './components/navbar'
+import Home from './components/home'
+//react
 import './App.css';
+import logo from './logo.svg';
 
 function App() {
   return (
@@ -7,19 +17,12 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          MERN with passport!
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <Signup />
       </header>
     </div>
-  );
+  )
 }
 
 export default App;
