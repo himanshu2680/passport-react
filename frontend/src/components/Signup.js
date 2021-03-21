@@ -1,12 +1,12 @@
 import React, {useState} from "react"
-import Axios from "axios"
+import axios from "axios"
 
 function Signup(){
   const [userName, setUserName] = useState("")
   const [password, setPassword] = useState("")
   function handleSubmit(e){
     e.preventDefault()
-    Axios.post("http://localhost:5000/signup", {
+    axios.post("/user/", {
       userName: userName,
       password: password
     }).then(response=>{
@@ -17,6 +17,7 @@ function Signup(){
   }
   return (
     <div>
+      <h4>signup</h4>
       <form onSubmit={handleSubmit}>
       <label htmlFor="userName">UserName</label>
       <input

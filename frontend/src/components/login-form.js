@@ -1,29 +1,29 @@
-import React from "react"
+import React, {useState} from "react"
 import { Redirect } from 'react-router-dom'
 import axios from 'axios'
 
 function Login(props){
   //prop 1- updateUser. It is a function in app.js that takes the user object that logs in as parameter and updates the setUser state in app.js
-  const [userName, setUserName] = useState("")
+  const [username, SetUsername] = useState("")
   const [password, setPassword] = useState("")
   const [redirectTo, setRedirectTo] = useState(null)
   
   function handleSubmit(e){
     e.preventDefault()
     axios
-      .post("http://localhost:5000/login", {
-        userName: userName,
+      .post("/user/login", {
+        username: username,
         password: password
       })
       .then(response=>{
         console.log(response);
         if (response.status===200) {
           
-          var {userName, _id}=response.data
+          var {username, _id}=response.data
           
           props.updateUser({
             loggedIn: true,
-            username: userName,
+            username: username,
             _id: _id
           })
           
@@ -36,7 +36,7 @@ function Login(props){
       .catch(error => {
         console.log(error);
       })
-    setUserName(""); 
+    SetUsername(""); 
     setPassword("")
   }
     if (redirectTo){
@@ -45,13 +45,14 @@ function Login(props){
     else {
       return (
         <div>
+          <h4>login</h4>
           <form onSubmit={handleSubmit}>
-          <label htmlFor="userName">UserName</label>
+          <label htmlFor="username">UserName</label>
           <input
             type="text"
-            name="userName"
-            value={userName}
-            onChange={e=>{setUserName(e.target.value)}}
+            name="username"
+            value={username}
+            onChange={e=>{SetUsername(e.target.value)}}
            />
           <label htmlFor="password">Password</label>
           <input
