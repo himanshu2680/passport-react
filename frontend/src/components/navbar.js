@@ -5,38 +5,37 @@ import axios from 'axios'
 import '../App.css'
 
 function Navbar(props){
-  //prop 1: loggedIn
+  //prop 1: updateUser
+  //prop 2: loggedIn
   function logout(e){
     e.preventDefault()
-    axios.post("/user/logout").then(response=> {
+    axios.post("http://localhost:5000/logout", {logout: true}, {withCredentials: true}).then(response=> {
       console.log(response.data)
-      if (response.status === 200){
-        props.updateUser({loggedIn: false, username:null})
+      if (response.data.msg === "success"){
+        props.updateUser({loggedIn: false, username:null, _id:null})
       }
     })
   }
-  const ts = "text-secondary"
   return (<div>
       <header className="navbar App-header" id="nav-container">
         <div className="col-4">
           {props.loggedIn?(
             <section className="navbar-section">
               <Link to="#" className="btn btn-link text-secondary"  onClick={logout}>
-                <span className={ts}>logout</span>
+                <span className="text-secondary">logout</span>
               </Link>
             </section>
           ):(
             <section>
-              <Link to="/" className={"btn btn-link"+ts}>
-                <span className={ts}>home</span>
+              <Link to="/" className="btn btn-link text-secondary">
+                <span className="text-secondary">home</span>
               </Link>
-              <Link to="/login" className={"btn btn-link"+ts}>
-                <span className={ts}>login</span>
+              <Link to="/login" className="btn btn-link text-secondary">
+                <span className="text-secondary">login</span>
               </Link>
-              <Link to="/signup" className={"btn btn-link"+ts}>
-                <span className={ts}>signup</span>
+              <Link to="/signup" className="btn btn-link text-secondary">
+                <span className="text-secondary">signup</span>
               </Link>
-
             </section>
           )}
         </div>

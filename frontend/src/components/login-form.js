@@ -4,22 +4,24 @@ import axios from 'axios'
 
 function Login(props){
   //prop 1- updateUser. It is a function in app.js that takes the user object that logs in as parameter and updates the setUser state in app.js
-  const [username, SetUsername] = useState("")
-  const [password, setPassword] = useState("")
+  const [formData, setFormData] = useState({
+    username:"",
+    password:""
+  })
   const [redirectTo, setRedirectTo] = useState(null)
-  
+  const [displayMessage, setDisplayMessage] = useState("")
   function handleSubmit(e){
+    console.log(formData.username);
     e.preventDefault()
     axios
-      .post("/user/login", {
-        username: username,
-        password: password
-      })
+      .post("http://localhost:5000/login", {
+        username: formData.username,
+        password: formData.password
+      }, {withCredentials: true})
       .then(response=>{
-        console.log(response);
-        if (response.status===200) {
-          
-          var {username, _id}=response.data
+        console.log(response.data);
+        var {username, _id}=response.data
+        if (response.status===200 && username && _id) {
           
           props.updateUser({
             loggedIn: true,
@@ -31,38 +33,90 @@ function Login(props){
         }
         else if(response.status===401) {
           console.log("access denied. your username or password might be incorrect.");
+          setDisplayMessage("Incorrect Username or password. Please try again.")
+        }
+        else{
+          console.log("unknown error occured");
+          setDisplayMessage("Server error. Please try again later.")
         }
       })
       .catch(error => {
-        console.log(error);
+        console.log(error.response.status);
+        if(error.response.status===401){
+          setDisplayMessage("Incorrect Username or password. Please try again.")
+        }else if(error.response.status===400){
+          setDisplayMessage("Username and password are required.")
+        }else{
+          setDisplayMessage("Server error. Please try again later.")
+        }
       })
-    SetUsername(""); 
-    setPassword("")
+    setFormData({
+      username:"", password:""
+    })
+  }
+  function handleChange(e){
+    setDisplayMessage("")
+    props.updateLoginMessage("")
+    const inputName=e.target.name
+    const newValue=e.target.value
+    setFormData(prevValue=>{
+      var changed = {[inputName]:newValue}
+      var {username, password}=Object.assign(prevValue, changed)
+      return {username:username, password:password}
+    })
   }
     if (redirectTo){
       return <Redirect to={{pathname:redirectTo}} />
     }
     else {
       return (
-        <div>
-          <h4>login</h4>
-          <form onSubmit={handleSubmit}>
-          <label htmlFor="username">UserName</label>
-          <input
-            type="text"
-            name="username"
-            value={username}
-            onChange={e=>{SetUsername(e.target.value)}}
-           />
-          <label htmlFor="password">Password</label>
-          <input
-             type="password"
-             name="password"
-             value={password}
-             onChange={e=>{setPassword(e.target.value)}}
-            />
-            <button type="submit">Submit</button>
+        <div className="loginForm">
+          <h4>Login</h4>
+          <p>{props.loginMessage}</p>
+          <form onSubmit={handleSubmit} className="form-horizontal">
+            
+            <div className="form-group">
+              <div className="col-1 col-ml-auto">
+                <label htmlFor="username" className="form-label">Username</label>
+              </div>
+              <div className="col-3 col-mr-auto">
+                <input
+                  placeholder="username"
+                  className="form-input"
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <div className="col-1 col-ml-auto">
+                <label htmlFor="password" className="form-label">Password</label>
+              </div>
+              <div className="col-3 col-mr-auto">
+                <input
+                  placeholder="password"
+                  className="form-input"
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+              </div>
+             </div>
+              
+             <div className="form-group ">
+               <div className="col-7"></div>
+               <button
+                 className="btn btn-primary col-1 col-mr-auto"
+                 type="submit"
+               >Log in</button>
+             </div>
+             
           </form>
+          <p style={{color:"red"}}>{displayMessage}</p>
         </div>
       )
     }
