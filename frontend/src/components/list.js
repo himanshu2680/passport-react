@@ -1,27 +1,25 @@
 import React, {useState} from "react"
-import ListItem from "./ListItem"
-import Axios from "axios"
+import ListItem from "./list-item"
+import axios from "axios"
 
-function List(){
+function List(props){
+  /*props-
+  userObject
+  */
   const url="http://localhost:5000"
-  const [formData, setFormData] = useState([])
-  
-  Axios.get(url+"/formData").then(res=>{setFormData(res.data)}).catch(err=>console.log(err))
+  const [inputValue, setInputValue] = useState("")
   
   function submitHandler(e){ 
-    Axios.post(url+"/formData", {itemName:e.target.itemName.value, isChecked:false})
     e.preventDefault()
-    Axios.get(url+"/formData").then(res=>{setFormData(res.data);})
+    var {value} = e.target.itemName
+    axios.post(url+"/save", {newListItem:{itemName:value, isChecked:false}, userId:props.userObject._id})
+    .then({
+      //update the state here using res gotten back from the server.
+    })
     e.target.itemName.value=""
   }
   
-  function deleteHandler(index){
-    Axios.post(url+"/delete", {_id: index})
-  }
-  
-  function checkHandler(index, isChecked){
-    Axios.post(url+"/check", {_id:index, isChecked:isChecked})
-  }
+
 
   return(
     <div>
@@ -31,16 +29,25 @@ function List(){
       </div>
       
       <div className="box">
-          {formData.map((item)=><ListItem 
-            key={item._id}
-            index={item._id}
-            itemName={item.itemName} 
-            isChecked={item.isChecked} 
-            deleteHandler={deleteHandler} 
-            checkHandler={checkHandler} 
+          {props.userObject.data && props.userObject.data.map((item)=><ListItem 
+            key={item._id} //only for react. do not access it.
+            item={item}
+            userId={props.userObject._id}
+            updateUser={props.updateUser}
           />)}
+          
         <form onSubmit={submitHandler} className="item">
-          <input className="itemsInput" placeholder="New Item" type="text" name="itemName" autoComplete="off" autoFocus required/>
+          <input
+            className="itemsInput"
+            placeholder="New Item"
+            type="text"
+            name="itemName"
+            onChange={e=>setInputValue(e.target.value)}
+            value={inputValue}
+            autoComplete="off"
+            autoFocus
+            required
+          />
           <button type="submit" className="add">+</button>
         </form>
       </div>   

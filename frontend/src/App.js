@@ -13,14 +13,17 @@ function App() {
   const [userObject, setUserObject]=useState(
     {loggedIn: false,
      username: null, 
-     _id:null})
+     _id:null,
+     data:null})
   const [loginMessage, setLoginMessage]=useState("")
   useEffect(()=>{
     getUser()
 
   }, [])
   function updateUser(userObject){
+    console.log("reached start of updateUser, id at this point: " + userObject._id);
     setUserObject(userObject)
+    console.log("reached end of updateUser, id at this point: " + userObject._id);
   }
   
   function updateLoginMessage(message){
@@ -29,14 +32,17 @@ function App() {
   
   function getUser(){
     axios.get('http://localhost:5000/', {withCredentials: true}).then(response => {
-      console.log(response.data);
+      console.log(response.data)
       const gotUser = response.data.user
       if(gotUser){
         setUserObject({
           loggedIn: true, 
           username: gotUser.username, 
-          _id:gotUser._id
+          _id:gotUser._id,
+          data:gotUser.data
         })
+        console.log(gotUser._id + "gotUser id")
+        console.log(userObject._id + "userObject id")
       }
     })
   }
@@ -53,17 +59,17 @@ function App() {
       {/* Routes to different components */}
       <Switch>        
         <Route exact path="/">
-          <Home />
+          <Home userObject={userObject} updateUser={updateUser}/>
         </Route>
         <Route path="/login">
           <LoginForm updateUser={updateUser} loginMessage={loginMessage} updateLoginMessage={updateLoginMessage}/>
         </Route>        
         <Route path="/signup">
-          <Signup userObject={userObject} updateLoginMessage={updateLoginMessage}/>
+          <Signup updateLoginMessage={updateLoginMessage}/>
         </Route>
       </Switch>
     </div>
   )
 }
 
-export default App;
+export default App

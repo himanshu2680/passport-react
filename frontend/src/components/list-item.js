@@ -1,29 +1,36 @@
 import React, {useState} from "react"
-
+import axios from "axios"
 function ListItem(props){
   /*
   props:-
-  index-item._id
-  itemName
-  isChecked
-  deleteHandler(f)
-  checkHandler(f)
+  item, userId, updateUser(f)
   */
-  var [isChecked, SetIsChecked] = useState(props.isChecked)
+  const url = "http://localhost:5000"
+  const {_id, isChecked, itemName} = props.item
   function checkHandler(e) {
-    SetIsChecked(!isChecked)
-    props.checkHandler(props.index, isChecked)
+    axios
+    .post(url+"/check", {userId:props.userId, itemId:_id})
+    .then(res=>{
+      console.log(res.data);
+    })
+  }
+  function deleteHandler(itemId){
+    axios
+    .post(url+"/delete", {userId:props.userId, itemId:_id})
+    .then(res=>{
+      console.log(res.data);
+    })
   }
   return (
     <div className="item flex">
       <input 
-        type="checkbox" 
+        type="checkbox"
         onChange={checkHandler}
         checked={isChecked}
       />
-        <p className="item-p">{props.itemName}</p>
+        <p className="item-p">{itemName}</p>
         <button 
-          className="bt-close-container" onClick={()=>{props.deleteHandler(props.index)}}>
+          className="bt-close-container" onClick={deleteHandler}>
           <img src="close.svg" alt="close" className="bt-close" />
         </button>
     </div>

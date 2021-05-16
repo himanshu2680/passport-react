@@ -3,15 +3,17 @@ import { Redirect } from 'react-router-dom'
 import axios from 'axios'
 
 function Login(props){
-  //prop 1- updateUser. It is a function in app.js that takes the user object that logs in as parameter and updates the setUser state in app.js
+  //prop 1- updateUser(f) calls setUser(f) on the user object.
+  //prop 2: updateLoginMessage(f)
+  //prop 3: loginMessage
   const [formData, setFormData] = useState({
     username:"",
     password:""
   })
-  const [redirectTo, setRedirectTo] = useState(null)
+  const [redirectTo, setRedirectTo] = useState("")
   const [displayMessage, setDisplayMessage] = useState("")
   function handleSubmit(e){
-    console.log(formData.username);
+    console.log(formData.username)
     e.preventDefault()
     axios
       .post("http://localhost:5000/login", {
@@ -19,32 +21,34 @@ function Login(props){
         password: formData.password
       }, {withCredentials: true})
       .then(response=>{
-        console.log(response.data);
-        var {username, _id}=response.data
+        console.log(response.data)
+        var {username, _id, data}=response.data
         if (response.status===200 && username && _id) {
-          
+          if(!data){
+            data = [{itemName:"sampleItem", isChecked:true}]
+          }
           props.updateUser({
             loggedIn: true,
             username: username,
-            _id: _id
+            _id: _id,
+            data: data
           })
-          
-          setRedirectTo('/')
+          setRedirectTo("/")
         }
         else if(response.status===401) {
-          console.log("access denied. your username or password might be incorrect.");
+          console.log("access denied. your username or password might be incorrect.")
           setDisplayMessage("Incorrect Username or password. Please try again.")
         }
         else{
-          console.log("unknown error occured");
+          console.log("unknown error occured")
           setDisplayMessage("Server error. Please try again later.")
         }
       })
       .catch(error => {
-        console.log(error.response.status);
-        if(error.response.status===401){
+        console.log(error)
+        if(error.response && error.response.status===401){
           setDisplayMessage("Incorrect Username or password. Please try again.")
-        }else if(error.response.status===400){
+        }else if(error.response && error.response.status===400){
           setDisplayMessage("Username and password are required.")
         }else{
           setDisplayMessage("Server error. Please try again later.")
@@ -65,7 +69,7 @@ function Login(props){
       return {username:username, password:password}
     })
   }
-    if (redirectTo){
+    if (redirectTo!=""){
       return <Redirect to={{pathname:redirectTo}} />
     }
     else {

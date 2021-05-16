@@ -12,7 +12,7 @@ function Navbar(props){
     axios.post("http://localhost:5000/logout", {logout: true}, {withCredentials: true}).then(response=> {
       console.log(response.data)
       if (response.data.msg === "success"){
-        props.updateUser({loggedIn: false, username:null, _id:null})
+        props.updateUser({loggedIn: false, username:null, _id:null, data:null})
       }
     })
   }
